@@ -82,11 +82,14 @@ describe.skip('Test clasp clone <scriptId> function', () => {
     expect(result.status).to.equal(0);
   });
   it('should give an error on a non-existing project', () => {
+    const settings = JSON.parse(fs.readFileSync('.clasp.json', 'utf8'));
+    fs.removeSync('.clasp.json');
     const result = spawnSync(
       CLASP, ['clone', 'non-existing-project'], { encoding: 'utf8' },
     );
     expect(result.stderr).to.contain('> Did you provide the correct scriptId?');
     expect(result.status).to.equal(1);
+    fs.writeFileSync('.clasp.json', JSON.stringify(settings));
   });
 });
 
@@ -271,6 +274,38 @@ describe('Test saveProjectId function from utils', () => {
       expect(id).to.equal('{"scriptId":"12345"}');
     };
     expect(isSaved).to.not.equal(null);
+  });
+});
+
+describe('Test clasp apis functions', () => {
+  it('should list apis correctly', () => {
+    const result = spawnSync(
+      'clasp', ['apis', 'list'], { encoding: 'utf8' },
+    );
+    expect(result.status).to.equal(0);
+    expect(result.stdout).to.contain('abusiveexperiencereport   - abusiveexperiencereport:v1');
+    expect(result.stdout).to.contain('youtubereporting          - youtubereporting:v1');
+  });
+  it('should enable apis correctly', () => {
+    const result = spawnSync(
+      'clasp', ['apis', 'enable'], { encoding: 'utf8' },
+    );
+    expect(result.status).to.equal(0);
+    expect(result.stdout).to.contain('In development...');
+  });
+  it('should disable apis correctly', () => {
+    const result = spawnSync(
+      'clasp', ['apis', 'disable'], { encoding: 'utf8' },
+    );
+    expect(result.status).to.equal(0);
+    expect(result.stdout).to.contain('In development...');
+  });
+  it('should error with unknown subcommand', () => {
+    const result = spawnSync(
+      'clasp', ['apis', 'unknown'], { encoding: 'utf8' },
+    );
+    expect(result.status).to.equal(1);
+    expect(result.stderr).to.contain('Unknown command "apis unknown"');
   });
 });
 

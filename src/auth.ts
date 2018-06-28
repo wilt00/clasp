@@ -10,8 +10,9 @@ import { Drive } from 'googleapis/build/src/apis/drive/v3';
 import { Logging } from 'googleapis/build/src/apis/logging/v2';
 import { Script } from 'googleapis/build/src/apis/script/v1';
 import { ClaspSettings, DOTFILE, ERROR, LOG, checkIfOnline, logError } from './utils';
-import open = require('open');
+import open = require('opn');
 import readline = require('readline');
+import { Discovery } from 'googleapis/build/src/apis/discovery/v1';
 import * as fs from 'fs';
 
 // API settings
@@ -36,18 +37,10 @@ const oauth2ClientSettings = {
 const oauth2Client = new OAuth2Client(oauth2ClientSettings);
 
 // Google API clients
-export const script = google.script({
-  version: 'v1',
-  auth: oauth2Client,
-}) as Script;
-export const logger = google.logging({
-  version: 'v2',
-  auth: oauth2Client,
-}) as Logging;
-export const drive = google.drive({
-  version: 'v3',
-  auth: oauth2Client,
-}) as Drive;
+export const script = google.script({version: 'v1', auth: oauth2Client}) as Script;
+export const logger = google.logging({version: 'v2', auth: oauth2Client}) as Logging;
+export const drive = google.drive({version: 'v3', auth: oauth2Client}) as Drive;
+export const discovery = google.discovery({version: 'v1'}) as Discovery;
 
 /**
  * Requests authorization to manage Apps Script projects.
@@ -128,6 +121,7 @@ async function authorizeWithLocalhost() {
     const authUrl = client.generateAuthUrl(oauth2ClientAuthUrlOpts);
     console.log(LOG.AUTHORIZE(authUrl));
     open(authUrl);
+    process.exit(0);
   });
   server.close();
   return (await client.getToken(authCode)).tokens;
