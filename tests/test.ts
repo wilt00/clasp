@@ -280,7 +280,7 @@ describe('Test saveProjectId function from utils', () => {
 describe('Test clasp apis functions', () => {
   it('should list apis correctly', () => {
     const result = spawnSync(
-      'clasp', ['apis', 'list'], { encoding: 'utf8' },
+      CLASP, ['apis', 'list'], { encoding: 'utf8' },
     );
     expect(result.status).to.equal(0);
     expect(result.stdout).to.contain('abusiveexperiencereport   - abusiveexperiencereport:v1');
@@ -288,21 +288,21 @@ describe('Test clasp apis functions', () => {
   });
   it('should enable apis correctly', () => {
     const result = spawnSync(
-      'clasp', ['apis', 'enable'], { encoding: 'utf8' },
+      CLASP, ['apis', 'enable'], { encoding: 'utf8' },
     );
     expect(result.status).to.equal(0);
     expect(result.stdout).to.contain('In development...');
   });
   it('should disable apis correctly', () => {
     const result = spawnSync(
-      'clasp', ['apis', 'disable'], { encoding: 'utf8' },
+      CLASP, ['apis', 'disable'], { encoding: 'utf8' },
     );
     expect(result.status).to.equal(0);
     expect(result.stdout).to.contain('In development...');
   });
   it('should error with unknown subcommand', () => {
     const result = spawnSync(
-      'clasp', ['apis', 'unknown'], { encoding: 'utf8' },
+      CLASP, ['apis', 'unknown'], { encoding: 'utf8' },
     );
     expect(result.status).to.equal(1);
     expect(result.stderr).to.contain('Unknown command "apis unknown"');
