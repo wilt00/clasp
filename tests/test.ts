@@ -10,25 +10,42 @@ const { spawnSync } = require('child_process');
 const TEST_CODE_JS = 'function test() { Logger.log(\'test\'); }';
 const TEST_JSON = '{"timeZone": "America/New_York"}';
 const CLASP = (os.type() === 'Windows_NT') ? 'clasp.cmd' : 'clasp';
+const isPR = process.env.TRAVIS_PULL_REQUEST;
 
-describe('Test help for each function', () => {
-  it('should output help for run command', () => {
+describe('Test --help for each function', () => {
+  const expectHelp = (command: string, expected: string) => {
     const result = spawnSync(
-      CLASP, ['run', '--help'], { encoding : 'utf8' },
+      CLASP, [command, '--help'], { encoding : 'utf8' },
     );
     expect(result.status).to.equal(0);
-    expect(result.stdout).to.include('Run a function in your Apps Scripts project');
-  });
-  it('should output help for logs command', () => {
-    const result = spawnSync(
-      CLASP, ['logs', '--help'], { encoding : 'utf8' },
-    );
-    expect(result.status).to.equal(0);
-    expect(result.stdout).to.include('Shows the StackDriver logs');
-  });
+    expect(result.stdout).to.include(expected);
+  };
+  it('should run --help', () => expectHelp('run', 'Run a function in your Apps Scripts project'));
+  it('should logs --help', () => expectHelp('logs', 'Shows the StackDriver logs'));
+  it('should login --help', () => expectHelp('login', 'Log in to script.google.com'));
+  it('should logout --help', () => expectHelp('logout', 'Log out'));
+  it('should create --help', () => expectHelp('create', 'Create a script'));
+  it('should clone --help', () => expectHelp('clone', 'Clone a project'));
+  it('should pull --help', () => expectHelp('pull', 'Fetch a remote project'));
+  it('should push --help', () => expectHelp('push', 'Update the remote project'));
+  it('should status --help', () => expectHelp('status', 'Lists files that will be pushed by clasp'));
+  it('should open --help', () => expectHelp('open', 'Open a script'));
+  it('should deployments --help', () => expectHelp('deployments', 'List deployment ids of a script'));
+  it('should undeploy --help', () => expectHelp('undeploy', 'Undeploy a deployment of a project'));
+  it('should redeploy --help', () => expectHelp('redeploy', 'Update a deployment'));
+  it('should versions --help', () => expectHelp('versions', 'List versions of a script'));
+  it('should version --help', () => expectHelp('version', 'Creates an immutable version of the script'));
+  it('should list --help', () => expectHelp('list', 'List App Scripts projects'));
+  it('should apis --help', () => expectHelp('apis', 'List, enable, or disable apis'));
+  it('should help --help', () => expectHelp('help', 'Display help'));
 });
 
-describe.skip('Test clasp list function', () => {
+describe('Test clasp list function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   it('should list clasp projects correctly', () => {
     const result = spawnSync(
       CLASP, ['list'], { encoding: 'utf8' },
@@ -41,14 +58,18 @@ describe.skip('Test clasp list function', () => {
   });
 });
 
-describe.skip('Test clasp create function', () => {
+describe('Test clasp create function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   it('should prompt for a project name correctly', () => {
     spawnSync('rm', ['.clasp.json']);
     const result = spawnSync(
       CLASP, ['create'], { encoding: 'utf8' },
     );
     expect(result.stdout).to.contain('Give a script title:');
-    expect(result.status).to.equal(0);
   });
   it('should not prompt for project name', () => {
     fs.writeFileSync('.clasp.json', '');
@@ -59,7 +80,12 @@ describe.skip('Test clasp create function', () => {
   });
 });
 
-describe.skip('Test clasp create <title> function', () => {
+describe('Test clasp create <title> function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   it('should create a new project named <title> correctly', () => {
     spawnSync('rm', ['.clasp.json']);
     const result = spawnSync(
@@ -70,7 +96,12 @@ describe.skip('Test clasp create <title> function', () => {
   });
 });
 
-describe.skip('Test clasp clone <scriptId> function', () => {
+describe('Test clasp clone <scriptId> function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   it('should clone an existing project correctly', () => {
     const settings = JSON.parse(fs.readFileSync('.clasp.json', 'utf8'));
     fs.removeSync('.clasp.json');
@@ -93,7 +124,12 @@ describe.skip('Test clasp clone <scriptId> function', () => {
   });
 });
 
-describe.skip('Test clasp pull function', () => {
+describe('Test clasp pull function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   it('should pull an existing project correctly', () => {
     const result = spawnSync(
       CLASP, ['pull'], { encoding: 'utf8' },
@@ -104,7 +140,12 @@ describe.skip('Test clasp pull function', () => {
   });
 });
 
-describe.skip('Test clasp push function', () => {
+describe('Test clasp push function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   it('should push local project correctly', () => {
     fs.removeSync('.claspignore');
     fs.writeFileSync('Code.js', TEST_CODE_JS);
@@ -130,7 +171,12 @@ describe.skip('Test clasp push function', () => {
   });
 });
 
-describe.skip('Test clasp status function', () => {
+describe('Test clasp status function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   function setupTmpDirectory(filepathsAndContents: Array<{ file: string, data: string }>) {
     fs.ensureDirSync('tmp');
     const tmpdir = tmp.dirSync({ unsafeCleanup: true, dir: 'tmp/', keep: false }).name;
@@ -171,7 +217,12 @@ describe.skip('Test clasp status function', () => {
   });
 });
 
-describe.skip('Test clasp open function', () => {
+describe('Test clasp open function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   it('should open a project correctly', () => {
     const result = spawnSync(
       CLASP, ['open'], { encoding: 'utf8' },
@@ -181,7 +232,12 @@ describe.skip('Test clasp open function', () => {
   });
 });
 
-describe.skip('Test clasp deployments function', () => {
+describe('Test clasp deployments function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   it('should list deployments correctly', () => {
     const result = spawnSync(
       CLASP, ['deployments'], { encoding: 'utf8' },
@@ -191,7 +247,12 @@ describe.skip('Test clasp deployments function', () => {
   });
 });
 
-describe.skip('Test clasp deploy function', () => {
+describe('Test clasp deploy function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   it('should deploy correctly', () => {
     const result = spawnSync(
       CLASP, ['deploy'], { encoding: 'utf8' },
@@ -201,7 +262,12 @@ describe.skip('Test clasp deploy function', () => {
   });
 });
 
-describe.skip('Test clasp version and versions function', () => {
+describe('Test clasp version and versions function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   let versionNumber = '';
   it('should create new version correctly', () => {
     const result = spawnSync(
@@ -221,14 +287,18 @@ describe.skip('Test clasp version and versions function', () => {
   });
 });
 
-describe.skip('Test clasp clone function', () => {
+describe('Test clasp clone function', () => {
+  before(function() {
+    if (isPR !== 'false') {
+      this.skip();
+    }
+  });
   it('should prompt for which script to clone correctly', () => {
     spawnSync('rm', ['.clasp.json']);
     const result = spawnSync(
       CLASP, ['clone'], { encoding: 'utf8' },
     );
     expect(result.stdout).to.contain('Clone which script?');
-    expect(result.status).to.equal(0);
   });
   it('should give an error if .clasp.json already exists', () => {
     fs.writeFileSync('.clasp.json', '');
@@ -323,35 +393,3 @@ describe('Test clasp logout function', () => {
     expect(dotExists).to.equal(false);
   });
 });
-
-/**
- * TODO: Test these commands and configs.
- *
- * # Commands:
- * [ ] clasp;
- * [ ] clasp login';
- * [ ] clasp login --no-localhost;
- * [x] clasp logout;
- * [x] clasp create "myTitle"
- * [x] clasp create <untitled>
- * [x] clasp list
- * [x] clasp clone <scriptId>
- * [x] clasp clone
- * [x] clasp pull
- * [x] clasp push
- * [ ] echo '// test' >> index.js && clasp push
- * [x] clasp open
- * [ ] clasp deployments
- * [ ] clasp deploy [version] [description]
- * [ ] clasp redeploy <deploymentId> <version> <description>
- * [ ] clasp version [description]
- * [x] clasp versions
- * [x] saveProjectId
- * [x] getScriptURL
- * [x] getFileType
- * [x] getAPIFileType
- *
- * # Configs
- * - .js and .gs files
- * - Ignored files
- */
